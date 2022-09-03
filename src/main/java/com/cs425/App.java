@@ -6,6 +6,13 @@ import org.unix4j.line.Line;
 import java.io.File;
 import java.util.List;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
 /**
  * Hello world!
  *
