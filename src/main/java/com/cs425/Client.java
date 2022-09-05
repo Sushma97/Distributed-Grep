@@ -1,5 +1,7 @@
 package com.cs425;
 
+import com.sun.media.sound.InvalidDataException;
+
 import java.io.IOException;
 
 public class Client {
@@ -13,12 +15,11 @@ public class Client {
 
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
-//        if (args.length < 1) {
-//            System.err.println("Usage: java client [grepPattern]");
-//        }
+        if (args.length != 1){
+            throw new InvalidDataException("Please input the regex to be searched");
+        }
         // Client creates GrepRequest based on arguments
-//        String grepPattern = args[0];
-        String grepPattern = "edu";
+        String grepPattern = args[0];
         // Client sends out GrepRequest over sockets to each server
         // We'll need some sort of lookup table for each machine
         // We may also want to parallelize this somehow
