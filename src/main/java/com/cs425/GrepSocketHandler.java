@@ -4,9 +4,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-
 /**
- * API to handle sending Grep requests and responses over sockets
+ * API to handle sending Grep requests and responses over sockets in parallel
  */
 public class GrepSocketHandler {
 
@@ -24,6 +23,7 @@ public class GrepSocketHandler {
     }
 
     public static void respondToGrepRequest(ServerSocket server) throws IOException, ClassNotFoundException {
+        // Open resources
         Socket client = server.accept();
         //For each client connection, server starts a child thread to process the request independent of any incoming requests
         new ServerThread(client).start();

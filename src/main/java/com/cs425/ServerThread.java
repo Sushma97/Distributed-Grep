@@ -16,17 +16,23 @@ public class ServerThread extends Thread {
     public void run() {
 
         try {
+            // Open resources
             ObjectOutputStream outputStream = new ObjectOutputStream(client.getOutputStream());
+            ObjectInputStream inputStream = new ObjectInputStream(client.getInputStream());
 
-        ObjectInputStream inputStream = new ObjectInputStream(client.getInputStream());
-        GrepRequest grepRequest = receiveGrepRequest(inputStream);
-        System.out.println("Received request " + grepRequest);
-        sendGrepResponse(grepRequest.runGrep(), outputStream);
+            // Receive request
+            GrepRequest grepRequest = receiveGrepRequest(inputStream);
 
-        inputStream.close();
-        outputStream.close();
-        client.close();
+            // Run request and send results
+            System.out.println("Received request " + grepRequest);
+            sendGrepResponse(grepRequest.runGrep(), outputStream);
+
+            // Close resources
+            inputStream.close();
+            outputStream.close();
+            client.close();
         } catch (IOException | ClassNotFoundException e) {
+            // Handle any errors
             System.out.println("Error in ServerThread for client " + client.getInetAddress());
             e.printStackTrace();
         }

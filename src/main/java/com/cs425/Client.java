@@ -1,12 +1,12 @@
 package com.cs425;
 
 import com.sun.media.sound.InvalidDataException;
-
 import java.io.IOException;
 
 public class Client {
+
     static final MachineLocation[] list = {
-            /* 1. */ new MachineLocation("0.0.0.0", 9876, "machine.i.log"),
+        /* 1. */ new MachineLocation("0.0.0.0", 9876, "../src/result.txt"),
         /* 2. */ new MachineLocation("0.0.0.0", 9876, "machine.1.log"),
         /* 3. */ new MachineLocation("0.0.0.0", 9876, "machine.2.log"),
         /* 4. */ new MachineLocation("0.0.0.0", 9876, "machine.3.log"),

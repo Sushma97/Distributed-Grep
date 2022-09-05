@@ -1,11 +1,11 @@
 package com.cs425;
 
-import org.unix4j.Unix4j;
-import org.unix4j.line.Line;
-
 import java.io.File;
 import java.io.Serializable;
 import java.util.List;
+
+import org.unix4j.Unix4j;
+import org.unix4j.unix.Grep;
 
 public class GrepRequest implements Serializable {
     private String filename;
@@ -28,11 +28,17 @@ public class GrepRequest implements Serializable {
         return grepPattern;
     }
 
-    // TODO, look into more grep options, maybe for line numbers?
     public GrepResponse runGrep() {
-        File file = new File("/Users/suzy/IdeaProjects/mp1_cs425_grep/src/main/resources/" + filename);
-        List<Line> lines = Unix4j.grep(grepPattern, file).toLineList();
-        return new GrepResponse(lines.size(), filename);
+        // Fault tolerance when file not found
+        // (This is treated as a RuntimeException by Unix4j.grep)
+        try {
+            File file = new File(filename);
+            // TODO pass options, for example Grep.Options.n:
+            List<String> lines = Unix4j.grep(Grep.Options.n, grepPattern, file).toStringList();
+            return new GrepResponse(lines, filename);
+        } catch (Exception exception) {
+            return new GrepResponse(filename);
+        }
     }
 
     @Override
@@ -41,6 +47,7 @@ public class GrepRequest implements Serializable {
                 "filename='" + filename + '\'' +
                 ", grepPattern='" + grepPattern + '\'' +
                 '}';
+        
     }
 }
 
