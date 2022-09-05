@@ -1,20 +1,23 @@
 package com.cs425;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.List;
 
 import org.unix4j.Unix4j;
 import org.unix4j.line.Line;
 
-public class GrepRequest {
+public class GrepRequest implements Serializable {
     private String filename;
     private String grepPattern;
+    public static final long serialVersionUID = -5399605122490343339L;
 
     // No setters, since we don't ever want to modify a grep request in-flight.
     // We just use the constructor to set values
     public GrepRequest(String grepPattern, String filename) {
         this.grepPattern = grepPattern;
         this.filename = filename;
+
     }
 
     public String getFilename() {
@@ -27,31 +30,18 @@ public class GrepRequest {
 
     // TODO, look into more grep options, maybe for line numbers?
     public GrepResponse runGrep() {
-        File file = new File(filename);
+        File file = new File("src/main/resources/" + filename);
         List<Line> lines = Unix4j.grep(grepPattern, file).toLineList();
-
-        return new GrepResponse(lines, filename);
+        return new GrepResponse(lines.size(), filename);
     }
 
-    public class GrepResponse {
-        private List<Line> lines;
-        private String filename;
-
-        public GrepResponse(List<Line> lines, String filename) {
-            this.lines = lines;
-            this.filename = filename;
-        }
-
-        // TODO A consideration:
-        // Is a string guaranteed to be large enough to actually hold all the data we need it to?
-        public String toString() {
-            String output = "Grep result from " + filename + "\n";
-            for(Line line : lines) {
-                // TODO line may already contain a newline char
-                output += line + "\n";
-            }
-            output += "Number of matching lines [" + filename + "]: " + lines.size();
-            return output;
-        }
+    @Override
+    public String toString() {
+        return "GrepRequest{" +
+                "filename='" + filename + '\'' +
+                ", grepPattern='" + grepPattern + '\'' +
+                '}';
     }
 }
+
+

@@ -1,7 +1,6 @@
 package com.cs425;
 
 import java.io.IOException;
-import java.lang.ClassNotFoundException;
 import java.net.ServerSocket;
 
 public class Server {
