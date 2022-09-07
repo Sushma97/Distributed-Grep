@@ -9,11 +9,17 @@ import java.util.List;
 public class Client {
 
     static final MachineLocation[] list = {
-            /* 1. */ new MachineLocation("0.0.0.0", 9876, "machine.i.log"),
-        /* 2. */ new MachineLocation("0.0.0.0", 9876, "machine.1.log"),
-        /* 3. */ new MachineLocation("0.0.0.0", 9876, "machine.2.log"),
-        /* 4. */ new MachineLocation("0.0.0.0", 9876, "machine.3.log"),
-        /* 5. */ new MachineLocation("0.0.0.0", 9876, "machine.4.log"),
+            /* 1. */ new MachineLocation("172.22.156.232", 9876, "vm1.log"),
+        /* 2. */ new MachineLocation("172.22.158.232", 9876, "vm2.log"),
+        /* 3. */ new MachineLocation("172.22.94.232", 9876, "vm3.log"),
+        /* 4. */ new MachineLocation("172.22.156.233", 9876, "vm4.log"),
+        /* 5. */ new MachineLocation("172.22.158.233", 9876, "vm5.log"),
+            /* 6. */ new MachineLocation("172.22.94.233", 9876, "vm6.log"),
+            /* 7. */ new MachineLocation("172.22.156.234", 9876, "vm7.log"),
+            /* 8. */ new MachineLocation("172.22.158.234", 9876, "vm8.log"),
+            /* 9. */ new MachineLocation("172.22.94.234", 9876, "vm9.log"),
+            /* 10. */ new MachineLocation("172.22.156.235", 9876, "vm10.log")
+
     };
 
 
