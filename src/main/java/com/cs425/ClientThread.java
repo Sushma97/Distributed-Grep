@@ -61,6 +61,7 @@ public class ClientThread extends Thread {
             System.out.println(response);
         } else {
             System.out.println("Machine (IP: " + ip + ", Port: " + port + ") offline.");
+            if(latch != null) latch.countDown();
         }
     }
 
