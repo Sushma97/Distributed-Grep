@@ -119,6 +119,26 @@ public class GrepRequest implements Serializable {
                 '}';
 
     }
+
+    public boolean equals(GrepRequest other) {
+        if (other == null) {
+            return false;
+        }
+
+        if ((this.filename == null && other.filename != null) || (this.filename != null && !this.filename.equals(other.filename))) {
+            return false;
+        }
+
+        if ((this.grepPattern == null && other.grepPattern != null) || (this.grepPattern != null && !this.grepPattern.equals(other.grepPattern))) {
+            return false;
+        }
+
+        if ((this.optionList == null && other.optionList != null) || (this.optionList != null && !this.optionList.equals(other.optionList))) {
+            return false;
+        }
+
+        return true;
+    }
 }
 
 
