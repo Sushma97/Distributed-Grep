@@ -48,4 +48,24 @@ public class GrepResponse implements Serializable {
         }
         return output;
     }
+
+    public boolean equals(GrepResponse other) {
+        if (other == null) {
+            return false;
+        }
+
+        if ((this.filename == null && other.filename != null) || (this.filename != null && !this.filename.equals(other.filename))) {
+            return false;
+        }
+
+        if ((this.lines == null && other.lines != null) || (this.lines != null && !this.lines.equals(other.lines))) {
+            return false;
+        }
+
+        if (this.initialized == other.initialized && this.fileExists == other.fileExists) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
