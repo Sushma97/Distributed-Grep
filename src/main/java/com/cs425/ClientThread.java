@@ -5,16 +5,20 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.util.concurrent.CountDownLatch;
 
 public class ClientThread extends Thread {
     private String ip;
     private Integer port;
     private GrepRequest request;
+    public static int totalCount = 0;
+    CountDownLatch latch;
 
-    public ClientThread(String ip, Integer port, GrepRequest request){
+    public ClientThread(String ip, Integer port, GrepRequest request, CountDownLatch latch){
         this.ip = ip;
         this.port = port;
         this.request = request;
+        this.latch = latch;
     }
 
     public void run(){
@@ -27,11 +31,19 @@ public class ClientThread extends Thread {
 
             sendGrepRequest(request, outputStream);
             response = receiveGrepResponse(inputStream);
-
+            synchronized (ClientThread.class) {
+                if (request.optionList.contains("c")) {
+                    totalCount += Integer.parseInt(response.lines.get(0));
+                }
+                else {
+                    totalCount += response.lines.size();
+                }
+            }
             // Close resources
             inputStream.close();
             outputStream.close();
             server.close();
+            if(latch != null) latch.countDown();
         } catch (ConnectException exception) {
             // Error handling for fault tolerance if connection refused or unavailable
             // Return uninitialized GrepResponse, so caller knows no connection was established

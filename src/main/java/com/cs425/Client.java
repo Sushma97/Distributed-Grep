@@ -5,6 +5,7 @@ import org.apache.commons.cli.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 public class Client {
 
@@ -23,7 +24,7 @@ public class Client {
     };
 
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException, InterruptedException {
 //        if (args.length != 1){
 //            throw new InvalidDataException("Please input the regex to be searched");
 //        }
@@ -33,13 +34,17 @@ public class Client {
         // Client sends out GrepRequest over sockets to each server
         // We'll need some sort of lookup table for each machine
         // We may also want to parallelize this somehow
+        int latchGroupCount = list.length;
+        CountDownLatch latch = new CountDownLatch(latchGroupCount);
         for (int i = 0; i < list.length; i++) {
             // Initialize grep request
             GrepRequest request = new GrepRequest(grepPattern, list[i].getLogFile(), cli.optionList);
             System.out.println("Sending the grepRequest " + request);
             // Send request and print results
-            GrepSocketHandler.grepRequest(list[i].getIp(), list[i].getPort(), request);
+            GrepSocketHandler.grepRequest(list[i].getIp(), list[i].getPort(), request, latch);
         }
+        latch.await();
+        System.out.println("Total matching lines count is: " + ClientThread.totalCount);
     }
 
     private static class CommandLineInput {
