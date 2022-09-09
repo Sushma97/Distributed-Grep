@@ -97,7 +97,7 @@ public class GrepRequest implements Serializable {
         // Fault tolerance when file not found
         // (This is treated as a RuntimeException by Unix4j.grep)
         try {
-            File file = new File("/Users/suzy/IdeaProjects/mp1_cs425_grep/src/main/resources/" + filename);
+            File file = new File("/home/sushmam3/" + filename);
             GrepOptionSet_Fcilnvx options = resolveGrepOptions(optionList);
             List<String> lines;
             if(options == null){

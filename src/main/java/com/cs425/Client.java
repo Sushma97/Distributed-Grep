@@ -5,19 +5,26 @@ import org.apache.commons.cli.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 public class Client {
 
     static final MachineLocation[] list = {
-            /* 1. */ new MachineLocation("0.0.0.0", 9876, "machine.i.log"),
-        /* 2. */ new MachineLocation("0.0.0.0", 9876, "machine.1.log"),
-        /* 3. */ new MachineLocation("0.0.0.0", 9876, "machine.2.log"),
-        /* 4. */ new MachineLocation("0.0.0.0", 9876, "machine.3.log"),
-        /* 5. */ new MachineLocation("0.0.0.0", 9876, "machine.4.log"),
+            /* 1. */ new MachineLocation("172.22.156.232", 9876, "vm1.log"),
+        /* 2. */ new MachineLocation("172.22.158.232", 9876, "vm2.log"),
+        /* 3. */ new MachineLocation("172.22.94.232", 9876, "vm3.log"),
+        /* 4. */ new MachineLocation("172.22.156.233", 9876, "vm4.log"),
+        /* 5. */ new MachineLocation("172.22.158.233", 9876, "vm5.log"),
+            /* 6. */ new MachineLocation("172.22.94.233", 9876, "vm6.log"),
+            /* 7. */ new MachineLocation("172.22.156.234", 9876, "vm7.log"),
+            /* 8. */ new MachineLocation("172.22.158.234", 9876, "vm8.log"),
+            /* 9. */ new MachineLocation("172.22.94.234", 9876, "vm9.log"),
+            /* 10. */ new MachineLocation("172.22.156.235", 9876, "vm10.log")
+
     };
 
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException, InterruptedException {
 //        if (args.length != 1){
 //            throw new InvalidDataException("Please input the regex to be searched");
 //        }
@@ -27,13 +34,17 @@ public class Client {
         // Client sends out GrepRequest over sockets to each server
         // We'll need some sort of lookup table for each machine
         // We may also want to parallelize this somehow
+        int latchGroupCount = list.length;
+        CountDownLatch latch = new CountDownLatch(latchGroupCount);
         for (int i = 0; i < list.length; i++) {
             // Initialize grep request
             GrepRequest request = new GrepRequest(grepPattern, list[i].getLogFile(), cli.optionList);
             System.out.println("Sending the grepRequest " + request);
             // Send request and print results
-            GrepSocketHandler.grepRequest(list[i].getIp(), list[i].getPort(), request);
+            GrepSocketHandler.grepRequest(list[i].getIp(), list[i].getPort(), request, latch);
         }
+        latch.await();
+        System.out.println("Total matching lines count is: " + ClientThread.totalCount);
     }
 
     private static class CommandLineInput {

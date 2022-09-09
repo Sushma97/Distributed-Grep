@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class GrepResponse implements Serializable {
-    private List<String> lines;
+    public List<String> lines;
     private String filename;
     private boolean initialized;
     private boolean fileExists = true;
@@ -42,12 +42,10 @@ public class GrepResponse implements Serializable {
         if (!fileExists) {
             return "File not found: " + filename;
         }
-
-        String output = "Grep results for " + filename + ":\n";
+        String output = "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\nGrep results for " + filename + ":\n";
         for(String line : lines) {
             output += line + "\n";
         }
-        output += "Number of matching lines [" + filename + "]: " + lines.size();
         return output;
     }
 }

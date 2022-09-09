@@ -3,12 +3,12 @@ package com.cs425;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * API to handle sending Grep requests and responses over sockets in parallel
  */
 public class GrepSocketHandler {
-
     /**
      * Sends a grep request and receives the response.
      * Note, the function attempts to connect the socket
@@ -16,9 +16,9 @@ public class GrepSocketHandler {
      * @return the grep response from the server
      * @throws ClassNotFoundException
      */
-    public static void grepRequest(String host, int port, GrepRequest request) throws IOException, ClassNotFoundException {
+    public static void grepRequest(String host, int port, GrepRequest request, CountDownLatch latch) throws IOException, ClassNotFoundException {
         // TODO error handling for fault tolerance if connection refused or unavailable
-        ClientThread client = new ClientThread(host, port, request);
+        ClientThread client = new ClientThread(host, port, request, latch);
         client.start();
     }
 
