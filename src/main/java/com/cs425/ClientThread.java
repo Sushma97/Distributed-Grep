@@ -43,7 +43,6 @@ public class ClientThread extends Thread {
             inputStream.close();
             outputStream.close();
             server.close();
-            if(latch != null) latch.countDown();
         } catch (ConnectException exception) {
             // Error handling for fault tolerance if connection refused or unavailable
             // Return uninitialized GrepResponse, so caller knows no connection was established
@@ -53,6 +52,8 @@ public class ClientThread extends Thread {
             System.out.println("Error in ClientThread for server " + ip);
             e.printStackTrace();
             return;
+        } finally {
+            if(latch != null) latch.countDown();
         }
 
         // Print results
