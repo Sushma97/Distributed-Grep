@@ -31,6 +31,9 @@ public class GrepRequest implements Serializable {
     }
 
     private GrepOptionSet_Fcilnvx resolveGrepOptions(List<String> options) {
+        if (options == null) {
+            return null;
+        }
         GrepOptionSets grepOptions = new GrepOptionSets();
         GrepOptionSet_Fcilnvx grepEnumOptions = null;
         for (String option : options) {
@@ -92,12 +95,12 @@ public class GrepRequest implements Serializable {
         }
         return grepEnumOptions;
     }
-    // TODO, look into more grep options, maybe for line numbers?
+
     public GrepResponse runGrep() {
         // Fault tolerance when file not found
         // (This is treated as a RuntimeException by Unix4j.grep)
         try {
-            File file = new File("/home/sushmam3/" + filename);
+            File file = new File(filename);
             GrepOptionSet_Fcilnvx options = resolveGrepOptions(optionList);
             List<String> lines;
             if(options == null){
