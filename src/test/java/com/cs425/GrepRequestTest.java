@@ -1,7 +1,7 @@
 package com.cs425;
 
+import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.List;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -88,8 +88,59 @@ public class GrepRequestTest extends TestCase {
         assertFalse(two.equals(one));
     }
 
-    // TODO
-    public void testRunGrep() {
-        assertTrue(true);
+    public void testRunGrepInfrequentLines() throws URISyntaxException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        String path = classLoader.getResource("result.txt").getPath();
+        
+        GrepRequest request = new GrepRequest("Sherlock", path, Arrays.asList("c"));
+        GrepResponse response = request.runGrep();
+
+        assertTrue("Response not initialized", response.isInitialized());
+        assertTrue("File not found", response.fileExists());
+
+        String count = response.lines.get(0);
+
+        assertEquals(count, "13");
+    }
+
+    public void testRunGrepFrequentLines() throws URISyntaxException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        String path = classLoader.getResource("result.txt").getPath();
+        
+        GrepRequest request = new GrepRequest("a", path, Arrays.asList("c"));
+        GrepResponse response = request.runGrep();
+
+        assertTrue("Response not initialized", response.isInitialized());
+        assertTrue("File not found", response.fileExists());
+
+        String count = response.lines.get(0);
+
+        assertEquals(count, "187");
+    }
+
+    public void testRunGrepLoadTestInfrequent() throws URISyntaxException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        String path = classLoader.getResource("enwik8").getPath();
+        
+        GrepRequest request = new GrepRequest("hello", path, null);
+        GrepResponse response = request.runGrep();
+
+        assertTrue("Response not initialized", response.isInitialized());
+        assertTrue("File not found", response.fileExists());
+
+        assertEquals(153, response.lines.size());
+    }
+
+    public void testRunGrepLoadTestFrequent() throws URISyntaxException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        String path = classLoader.getResource("enwik8").getPath();
+        
+        GrepRequest request = new GrepRequest("e", path, null);
+        GrepResponse response = request.runGrep();
+
+        assertTrue("Response not initialized", response.isInitialized());
+        assertTrue("File not found", response.fileExists());
+
+        assertEquals(693181, response.lines.size());
     }
 }
