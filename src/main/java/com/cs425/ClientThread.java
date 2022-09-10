@@ -32,11 +32,12 @@ public class ClientThread extends Thread {
             sendGrepRequest(request, outputStream);
             response = receiveGrepResponse(inputStream);
             synchronized (ClientThread.class) {
-                if (request.optionList.contains("c")) {
-                    totalCount += Integer.parseInt(response.lines.get(0));
-                }
-                else {
-                    totalCount += response.lines.size();
+                if (response.lines != null) {
+                    if (request.optionList.contains("c")) {
+                        totalCount += Integer.parseInt(response.lines.get(0));
+                    } else {
+                        totalCount += response.lines.size();
+                    }
                 }
             }
             // Close resources
@@ -61,7 +62,6 @@ public class ClientThread extends Thread {
             System.out.println(response);
         } else {
             System.out.println("Machine (IP: " + ip + ", Port: " + port + ") offline.");
-            if(latch != null) latch.countDown();
         }
     }
 

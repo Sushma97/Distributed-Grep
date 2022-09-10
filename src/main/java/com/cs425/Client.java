@@ -25,9 +25,7 @@ public class Client {
 
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException, InterruptedException {
-//        if (args.length != 1){
-//            throw new InvalidDataException("Please input the regex to be searched");
-//        }
+        String basePath = "/home/sushmam3/";
         CommandLineInput cli = new CommandLineInput(args);
         // Client creates GrepRequest based on arguments
         String grepPattern = cli.pattern;
@@ -38,7 +36,7 @@ public class Client {
         CountDownLatch latch = new CountDownLatch(latchGroupCount);
         for (int i = 0; i < list.length; i++) {
             // Initialize grep request
-            GrepRequest request = new GrepRequest(grepPattern, list[i].getLogFile(), cli.optionList);
+            GrepRequest request = new GrepRequest(grepPattern, basePath + list[i].getLogFile(), cli.optionList);
             System.out.println("Sending the grepRequest " + request);
             // Send request and print results
             GrepSocketHandler.grepRequest(list[i].getIp(), list[i].getPort(), request, latch);

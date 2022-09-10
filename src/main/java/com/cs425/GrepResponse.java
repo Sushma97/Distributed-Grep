@@ -42,7 +42,8 @@ public class GrepResponse implements Serializable {
         if (!fileExists) {
             return "File not found: " + filename;
         }
-        String output = "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\nGrep results for " + filename + ":\n";
+        String[] filePath = filename.split("/");
+        String output = "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\nGrep results for " + filePath[filePath.length - 1] + ":\n";
         for(String line : lines) {
             output += line + "\n";
         }
