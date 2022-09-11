@@ -151,11 +151,10 @@ public class GrepRequestTest extends TestCase {
     static Map<String, int[]> expectedResults;
     static {
         expectedResults = new HashMap<>();
-        // expectedResults.put("pattern", new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
         expectedResults.put("hello", new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
         expectedResults.put("10/Feb/2024", new int[]{145, 0, 0, 0, 0, 0, 0, 0, 0, 0});
         expectedResults.put("DELETE", new int[]{27976, 26754, 26854, 27144, 27293, 26846, 27031, 27294, 26898, 26437});
-        expectedResults.put(".*.com", new int[]{176215, 166375, 166628, 167602, 168172, 166856, 166647, 170350, 167511, 164903});
+        expectedResults.put(".com", new int[]{176215, 166375, 166628, 167602, 168172, 166856, 166647, 170350, 167511, 164903});
     }
 
     public void testRunGrepDistributed() throws URISyntaxException {
