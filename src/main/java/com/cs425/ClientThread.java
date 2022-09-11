@@ -6,6 +6,8 @@ import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ClientThread extends Thread {
     private String ip;
@@ -14,6 +16,8 @@ public class ClientThread extends Thread {
     public static int totalCount = 0;
     private volatile GrepResponse response = null;
     CountDownLatch latch;
+
+    private static Lock printLock = new ReentrantLock();
 
     public ClientThread(String ip, Integer port, GrepRequest request, CountDownLatch latch){
         this.ip = ip;
@@ -62,11 +66,13 @@ public class ClientThread extends Thread {
         this.response = response;
 
         // Print results
+        printLock.lock();
         if (response.isInitialized()) {
-            System.out.println(response);
+            response.print();
         } else {
             System.out.println("Machine (IP: " + ip + ", Port: " + port + ") offline.");
         }
+        printLock.unlock();
     }
 
     public GrepResponse getGrepResponse() {

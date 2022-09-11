@@ -36,18 +36,16 @@ public class GrepResponse implements Serializable {
         return fileExists;
     }
 
-    // TODO A consideration:
-    // Is a string guaranteed to be large enough to actually hold all the data we need it to?
-    public String toString() {
+    public void print() {
         if (!fileExists) {
-            return "File not found: " + filename;
+            System.out.println("File not found: " + filename);
+            return;
         }
         String[] filePath = filename.split("/");
-        String output = "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\nGrep results for " + filePath[filePath.length - 1] + ":\n";
+        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\nGrep results for " + filePath[filePath.length - 1] + ":");
         for(String line : lines) {
-            output += line + "\n";
+            System.out.println(line);
         }
-        return output;
     }
 
     public boolean equals(GrepResponse other) {
