@@ -2,6 +2,10 @@ package com.cs425;
 
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -143,4 +147,57 @@ public class GrepRequestTest extends TestCase {
 
         assertEquals(693181, response.lines.size());
     }
+
+    static Map<String, int[]> expectedResults;
+    static {
+        expectedResults = new HashMap<>();
+        // expectedResults.put("pattern", new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+        expectedResults.put("hello", new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+        expectedResults.put("10/Feb/2024", new int[]{145, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+        expectedResults.put("DELETE", new int[]{27976, 26754, 26854, 27144, 27293, 26846, 27031, 27294, 26898, 26437});
+        expectedResults.put(".*.com", new int[]{176215, 166375, 166628, 167602, 168172, 166856, 166647, 170350, 167511, 164903});
+    }
+
+    public void testRunGrepDistributed() throws URISyntaxException {
+        // To keep track of offline machines so we skip testing those
+        Set<Integer> offlineMachines = new HashSet<>();
+
+        for (Map.Entry<String,int[]> entry : expectedResults.entrySet()) {
+            String pattern = entry.getKey();
+            int[] expectedValues = entry.getValue();
+
+            for (int i = 0; i < expectedValues.length; ++i) {
+                // Skip this machine if it is offline
+                if (offlineMachines.contains(i)) {
+                    continue;
+                }
+
+                // Create request and thread
+                GrepRequest request = new GrepRequest(pattern, Client.list[i].getLogFile(), Arrays.asList("c"));
+                ClientThread thread = new ClientThread(Client.list[i].getIp(), Client.list[i].getPort(), request, null);
+                
+                // Run request asynchronously
+                thread.start();
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    fail("Thread interrupted");
+                }
+                GrepResponse response = thread.getGrepResponse();
+
+                // If response is null, there was an error with thread creation/running
+                assertNotNull(response);
+
+                // Only check equal if server was online
+                if (response.isInitialized()) {
+                    assertEquals(expectedValues[i], Integer.parseInt(response.lines.get(0)));
+                } else {
+                    // Mark machine as offline so we skip later
+                    offlineMachines.add(i);
+                }
+            }
+        };
+    }
+
 }
