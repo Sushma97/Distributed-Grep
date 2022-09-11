@@ -1,60 +1,83 @@
 package com.cs425;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.cli.*;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+/**
+ * Class that launches client with the ability to query logs on distributed machines
+ */
 public class Client {
 
-    private static final String basePath = "/srv/mp1_logs/";
-    static final MachineLocation[] list = {
-        /* 1. */ new MachineLocation("172.22.156.232", 9876, basePath + "vm1.log"),
-        /* 2. */ new MachineLocation("172.22.158.232", 9876, basePath + "vm2.log"),
-        /* 3. */ new MachineLocation("172.22.94.232", 9876, basePath + "vm3.log"),
-        /* 4. */ new MachineLocation("172.22.156.233", 9876, basePath + "vm4.log"),
-        /* 5. */ new MachineLocation("172.22.158.233", 9876, basePath + "vm5.log"),
-        /* 6. */ new MachineLocation("172.22.94.233", 9876, basePath + "vm6.log"),
-        /* 7. */ new MachineLocation("172.22.156.234", 9876, basePath + "vm7.log"),
-        /* 8. */ new MachineLocation("172.22.158.234", 9876, basePath + "vm8.log"),
-        /* 9. */ new MachineLocation("172.22.94.234", 9876, basePath + "vm9.log"),
-        /* 10. */ new MachineLocation("172.22.156.235", 9876, basePath + "vm10.log")
+    /**
+     * Fetches server details
+     *
+     * @param filename json file containing server details
+     * @return list of Machine.
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public static List<MachineLocation> getServerList(String filename) {
+        try (InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(filename)) {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jn = mapper.readValue(stream, JsonNode.class);
+            String serverList = mapper.writeValueAsString(jn);
+            List<MachineLocation> list = mapper.readValue(serverList, new TypeReference<List<MachineLocation>>() {
+            });
+            return list;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-    };
-
-
-    public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException, InterruptedException {
+    public static void main(String[] args) throws ParseException, InterruptedException{
+        // Fetch server details
+        List<MachineLocation> list = getServerList("server.json");
         CommandLineInput cli = new CommandLineInput(args);
         // Client creates GrepRequest based on arguments
         String grepPattern = cli.pattern;
-        // Client sends out GrepRequest over sockets to each server
-        // We'll need some sort of lookup table for each machine
-        // We may also want to parallelize this somehow
-        int latchGroupCount = list.length;
+        // Tracks the number of threads
+        int latchGroupCount = list.size();
         CountDownLatch latch = new CountDownLatch(latchGroupCount);
-        for (int i = 0; i < list.length; i++) {
+        // Client sends out GrepRequest over sockets to each server
+        for (MachineLocation machine : list) {
             // Initialize grep request
-            GrepRequest request = new GrepRequest(grepPattern, list[i].getLogFile(), cli.optionList);
+            GrepRequest request = new GrepRequest(grepPattern, machine.getLogFile(), cli.optionList);
             System.out.println("Sending the grepRequest " + request);
             // Send request and print results
-            GrepSocketHandler.grepRequest(list[i].getIp(), list[i].getPort(), request, latch);
+            GrepSocketHandler.grepRequest(machine.getIp(), machine.getPort(), request, latch);
         }
+        // Waits for all the threads to finish their process
         latch.await();
+        // Print total number of matching lines
         System.out.println("Total matching lines count is: " + ClientThread.totalCount);
     }
 
+    /**
+     * Parses the command line arguments
+     */
     private static class CommandLineInput {
+        // Variable to hold the grep options used in CLI
         public List<String> optionList;
+        // Variable to hold the pattern to search for
         public String pattern;
 
         public CommandLineInput(String[] args) throws ParseException {
             Options options = generateOptions();
             CommandLineParser parser = new DefaultParser();
+            // Parse CLI for options
             CommandLine cmd = parser.parse(options, args);
             optionList = new ArrayList<>();
             pattern = null;
+            // Pattern is required
             if (!cmd.hasOption("pattern")) {
                 throw new ParseException("search input is a required argument");
             }
@@ -87,32 +110,45 @@ public class Client {
         }
     }
 
-
-
+    /**
+     * Generate the options for grep
+     *
+     * @return Grep options
+     */
     private static Options generateOptions() {
-        Options options =new Options();
-        options.addOption(new Option("c","grep option to count matching lines"));
+        Options options = new Options();
+        options.addOption(new Option("c", "grep option to count matching lines"));
         options.addOption(new Option("F", "grep option to use fixed-strings matching instead of regular expressions"));
-        options.addOption(new Option("i","grep option to ignore case"));
-        options.addOption(new Option("v","grep option to invert match"));
-        options.addOption(new Option("n","grep option to prefix each line of output with the line number within its input file"));
-        options.addOption(new Option("l","grep option to print the name of each input file"));
-        options.addOption(new Option("x","grep option to match whole sentence only"));
+        options.addOption(new Option("i", "grep option to ignore case"));
+        options.addOption(new Option("v", "grep option to invert match"));
+        options.addOption(new Option("n", "grep option to prefix each line of output with the line number within its input file"));
+        options.addOption(new Option("l", "grep option to print the name of each input file"));
+        options.addOption(new Option("x", "grep option to match whole sentence only"));
         options.addOption(OptionBuilder.withArgName("pattern").hasArg().withDescription("*Required Option* grep string")
                 .create("pattern"));
         return options;
     }
 
-
-
+    /**
+     * Class to track the server details
+     */
     public static class MachineLocation {
         private String ip;
         private int port;
         private String logFile;
 
-        public MachineLocation(String ip, int port, String logFile) {
+        public MachineLocation() {
+        }
+
+        public void setIp(String ip) {
             this.ip = ip;
+        }
+
+        public void setPort(int port) {
             this.port = port;
+        }
+
+        public void setLogFile(String logFile) {
             this.logFile = logFile;
         }
 

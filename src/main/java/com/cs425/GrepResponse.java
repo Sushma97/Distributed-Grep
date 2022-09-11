@@ -3,9 +3,14 @@ package com.cs425;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Wrapper class for grep response object sent from server to client.
+ */
 public class GrepResponse implements Serializable {
+    // Matching lines from grep query
     public List<String> lines;
     private String filename;
+    // Variable to find out if machine is online
     private boolean initialized;
     private boolean fileExists = true;
 
@@ -14,7 +19,7 @@ public class GrepResponse implements Serializable {
     public GrepResponse() {
         this.initialized = false;
     }
-    
+
     public GrepResponse(List<String> lines, String filename) {
         this.lines = lines;
         this.filename = filename;

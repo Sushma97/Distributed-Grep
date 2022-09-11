@@ -8,6 +8,9 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Wrapper class for the Grep request object sent from client to the server. Once received by the server, performs the grep query locally
+ */
 public class GrepRequest implements Serializable {
     private String filename;
     private String grepPattern;
@@ -30,6 +33,12 @@ public class GrepRequest implements Serializable {
         return grepPattern;
     }
 
+    /**
+     * Resolve the grep options provided in the CLI
+     *
+     * @param options list of grep options used by user
+     * @return
+     */
     private GrepOptionSet_Fcilnvx resolveGrepOptions(List<String> options) {
         if (options == null) {
             return null;
@@ -96,6 +105,7 @@ public class GrepRequest implements Serializable {
         return grepEnumOptions;
     }
 
+    // Runs the grep query on server
     public GrepResponse runGrep() {
         // Fault tolerance when file not found
         // (This is treated as a RuntimeException by Unix4j.grep)
@@ -103,11 +113,12 @@ public class GrepRequest implements Serializable {
             File file = new File(filename);
             GrepOptionSet_Fcilnvx options = resolveGrepOptions(optionList);
             List<String> lines;
-            if(options == null){
+            if (options == null) {
                 lines = Unix4j.grep(grepPattern, file).toStringList();
-            }else{
+            } else {
                 lines = Unix4j.grep(options, grepPattern, file).toStringList();
             }
+            // Wrap the result of Unix4j grep in GrepResponse object
             return new GrepResponse(lines, filename);
         } catch (Exception exception) {
             return new GrepResponse(filename);

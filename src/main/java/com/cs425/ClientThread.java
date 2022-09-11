@@ -9,35 +9,44 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * Client call to each server is in a separate thread.
+ * Sends the grep request to server and prints the received response
+ */
 public class ClientThread extends Thread {
     private String ip;
     private Integer port;
     private GrepRequest request;
-    public static int totalCount = 0;
     private volatile GrepResponse response = null;
-    CountDownLatch latch;
+    //Variable to track the total count of matching lines.
+    public static int totalCount = 0;
+    //Variable to identify when all the client threads are completed
+    public CountDownLatch latch;
 
     private static Lock printLock = new ReentrantLock();
 
-    public ClientThread(String ip, Integer port, GrepRequest request, CountDownLatch latch){
+    public ClientThread(String ip, Integer port, GrepRequest request, CountDownLatch latch) {
         this.ip = ip;
         this.port = port;
         this.request = request;
         this.latch = latch;
     }
 
-    public void run(){
+    public void run() {
         GrepResponse response;
         try {
             // Open resources
             Socket server = new Socket(ip, port);
             ObjectOutputStream outputStream = new ObjectOutputStream(server.getOutputStream());
             ObjectInputStream inputStream = new ObjectInputStream(server.getInputStream());
-
+            //Send the grep request to server
             sendGrepRequest(request, outputStream);
+            //Fetch the grep response from server
             response = receiveGrepResponse(inputStream);
             synchronized (ClientThread.class) {
+                //If the response was successful then find out the count of matching lines
                 if (response.lines != null) {
+                    //If count flag is used, add the count value in the response
                     if (request.optionList.contains("c")) {
                         totalCount += Integer.parseInt(response.lines.get(0));
                     } else {
@@ -59,7 +68,8 @@ public class ClientThread extends Thread {
             e.printStackTrace();
             return;
         } finally {
-            if(latch != null) latch.countDown();
+            // Track the end of each thread
+            if (latch != null) latch.countDown();
         }
 
         // Save result
