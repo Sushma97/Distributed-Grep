@@ -5,6 +5,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+/**
+ * Server handles each client request in a thread.
+ * Responds to the grep request, runs the query and returns the results to client
+ */
 public class ServerThread extends Thread {
 
     private Socket client;

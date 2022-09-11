@@ -1,11 +1,8 @@
 package com.cs425;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -157,10 +154,10 @@ public class GrepRequestTest extends TestCase {
         expectedResults.put(".com", new int[]{176215, 166375, 166628, 167602, 168172, 166856, 166647, 170350, 167511, 164903});
     }
 
-    public void testRunGrepDistributed() throws URISyntaxException {
-        // To keep track of offline machines so we skip testing those
+    public void testRunGrepDistributed() {
+        // To keep track of offline machines, so we skip testing those
         Set<Integer> offlineMachines = new HashSet<>();
-
+        List<Client.MachineLocation> list = Client.getServerList("server.json");
         for (Map.Entry<String,int[]> entry : expectedResults.entrySet()) {
             String pattern = entry.getKey();
             int[] expectedValues = entry.getValue();
@@ -172,9 +169,9 @@ public class GrepRequestTest extends TestCase {
                 }
 
                 // Create request and thread
-                GrepRequest request = new GrepRequest(pattern, Client.list[i].getLogFile(), Arrays.asList("c"));
-                ClientThread thread = new ClientThread(Client.list[i].getIp(), Client.list[i].getPort(), request, null);
-                
+                GrepRequest request = new GrepRequest(pattern, list.get(i).getLogFile(), Arrays.asList("c"));
+                ClientThread thread = new ClientThread(list.get(i).getIp(), list.get(i).getPort(), request, null);
+
                 // Run request asynchronously
                 thread.start();
                 try {
@@ -196,7 +193,7 @@ public class GrepRequestTest extends TestCase {
                     offlineMachines.add(i);
                 }
             }
-        };
+        }
     }
 
 }
