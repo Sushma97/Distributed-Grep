@@ -10,16 +10,16 @@ import java.util.concurrent.CountDownLatch;
 public class Client {
 
     static final MachineLocation[] list = {
-            /* 1. */ new MachineLocation("172.22.156.232", 9876, "vm1.log"),
-        /* 2. */ new MachineLocation("172.22.158.232", 9876, "vm2.log"),
-        /* 3. */ new MachineLocation("172.22.94.232", 9876, "vm3.log"),
-        /* 4. */ new MachineLocation("172.22.156.233", 9876, "vm4.log"),
-        /* 5. */ new MachineLocation("172.22.158.233", 9876, "vm5.log"),
-            /* 6. */ new MachineLocation("172.22.94.233", 9876, "vm6.log"),
-            /* 7. */ new MachineLocation("172.22.156.234", 9876, "vm7.log"),
-            /* 8. */ new MachineLocation("172.22.158.234", 9876, "vm8.log"),
-            /* 9. */ new MachineLocation("172.22.94.234", 9876, "vm9.log"),
-            /* 10. */ new MachineLocation("172.22.156.235", 9876, "vm10.log")
+        /* 1. */ new MachineLocation("172.22.156.232", 9876, "/srv/mp1_logs/vm1.log"),
+        /* 2. */ new MachineLocation("172.22.158.232", 9876, "/srv/mp1_logs/vm2.log"),
+        /* 3. */ new MachineLocation("172.22.94.232", 9876, "/srv/mp1_logs/vm3.log"),
+        /* 4. */ new MachineLocation("172.22.156.233", 9876, "/srv/mp1_logs/vm4.log"),
+        /* 5. */ new MachineLocation("172.22.158.233", 9876, "/srv/mp1_logs/vm5.log"),
+        /* 6. */ new MachineLocation("172.22.94.233", 9876, "/srv/mp1_logs/vm6.log"),
+        /* 7. */ new MachineLocation("172.22.156.234", 9876, "/srv/mp1_logs/vm7.log"),
+        /* 8. */ new MachineLocation("172.22.158.234", 9876, "/srv/mp1_logs/vm8.log"),
+        /* 9. */ new MachineLocation("172.22.94.234", 9876, "/srv/mp1_logs/vm9.log"),
+        /* 10. */ new MachineLocation("172.22.156.235", 9876, "/srv/mp1_logs/vm10.log")
 
     };
 
@@ -105,7 +105,7 @@ public class Client {
 
 
 
-    private static class MachineLocation {
+    public static class MachineLocation {
         private String ip;
         private int port;
         private String logFile;

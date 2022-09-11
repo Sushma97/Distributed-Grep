@@ -12,6 +12,7 @@ public class ClientThread extends Thread {
     private Integer port;
     private GrepRequest request;
     public static int totalCount = 0;
+    private volatile GrepResponse response = null;
     CountDownLatch latch;
 
     public ClientThread(String ip, Integer port, GrepRequest request, CountDownLatch latch){
@@ -57,12 +58,19 @@ public class ClientThread extends Thread {
             if(latch != null) latch.countDown();
         }
 
+        // Save result
+        this.response = response;
+
         // Print results
         if (response.isInitialized()) {
             System.out.println(response);
         } else {
             System.out.println("Machine (IP: " + ip + ", Port: " + port + ") offline.");
         }
+    }
+
+    public GrepResponse getGrepResponse() {
+        return this.response;
     }
 
     private static void sendGrepRequest(GrepRequest request, ObjectOutputStream outputStream) throws IOException {
